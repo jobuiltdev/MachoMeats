@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useCart, type CartLine } from "@/contexts/CartContext";
 import { formatNaira } from "@/lib/products";
-import { DELIVERY_ZONES, getDeliveryZoneById } from "@/lib/delivery";
+import { matchLocationToZone } from "@/lib/delivery";
 import {
   BUSINESS_BANK_DETAILS,
   PAYMENT_WINDOW_MINUTES,
@@ -22,6 +22,7 @@ type PlacedOrder = {
   orderRef: string;
   customerName: string;
   customerEmail: string;
+  customerPhone: string;
   lines: CartLine[];
   subtotal: number;
   deliveryZoneName: string;
@@ -29,19 +30,24 @@ type PlacedOrder = {
   total: number;
 };
 
+type SendStatus = "idle" | "sending" | "sent" | "error";
+
 export default function CheckoutFlow() {
   const { lines, subtotal, clearCart } = useCart();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [zoneId, setZoneId] = useState<string>("");
+  const [location, setLocation] = useState("");
+  const [locationTouched, setLocationTouched] = useState(false);
   const [order, setOrder] = useState<PlacedOrder | null>(null);
-  const [emailStatus, setEmailStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [invoiceStatus, setInvoiceStatus] = useState<SendStatus>("idle");
+  const [paymentNoticeStatus, setPaymentNoticeStatus] = useState<SendStatus>("idle");
 
-  const zone = getDeliveryZoneById(zoneId);
+  const zone = useMemo(() => matchLocationToZone(location), [location]);
+  const locationUnavailable = locationTouched && location.trim().length >= 3 && !zone;
   const total = subtotal + (zone?.fee ?? 0);
 
-  async function handlePlaceOrder(event: FormEvent<HTMLFormElement>) {
+  async function handleConfirmOrder(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!zone) return;
 
@@ -50,6 +56,7 @@ export default function CheckoutFlow() {
       orderRef,
       customerName: name,
       customerEmail: email,
+      customerPhone: phone,
       lines,
       subtotal,
       deliveryZoneName: zone.name,
@@ -59,7 +66,7 @@ export default function CheckoutFlow() {
 
     setOrder(placed);
     clearCart();
-    setEmailStatus("sending");
+    setInvoiceStatus("sending");
 
     try {
       const res = await fetch("/api/send-invoice", {
@@ -76,9 +83,25 @@ export default function CheckoutFlow() {
           total,
         }),
       });
-      setEmailStatus(res.ok ? "sent" : "error");
+      setInvoiceStatus(res.ok ? "sent" : "error");
     } catch {
-      setEmailStatus("error");
+      setInvoiceStatus("error");
+    }
+  }
+
+  async function handleIvePaid() {
+    if (!order || paymentNoticeStatus === "sending" || paymentNoticeStatus === "sent") return;
+
+    setPaymentNoticeStatus("sending");
+    try {
+      const res = await fetch("/api/notify-payment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(order),
+      });
+      setPaymentNoticeStatus(res.ok ? "sent" : "error");
+    } catch {
+      setPaymentNoticeStatus("error");
     }
   }
 
@@ -121,32 +144,49 @@ export default function CheckoutFlow() {
         </div>
 
         <p className="font-body text-sm text-olive-mute mt-6">
-          {emailStatus === "sent" &&
-            `We've emailed your invoice to ${order.customerEmail}.`}
-          {emailStatus === "sending" && "Sending your invoice by email…"}
-          {emailStatus === "error" &&
+          {invoiceStatus === "sent" && `We've emailed your invoice to ${order.customerEmail}.`}
+          {invoiceStatus === "sending" && "Sending your invoice by email…"}
+          {invoiceStatus === "error" &&
             "We couldn't email your invoice, but your order details are all above — no need to wait on it."}
+        </p>
+
+        <Button
+          type="button"
+          variant="primary"
+          className="mt-6 w-full"
+          disabled={paymentNoticeStatus === "sending" || paymentNoticeStatus === "sent"}
+          onClick={handleIvePaid}
+        >
+          {paymentNoticeStatus === "sent" ? "We've been notified" : "I've paid"}
+        </Button>
+
+        <p className="font-body text-sm text-olive-mute mt-3">
+          {paymentNoticeStatus === "sending" && "Letting us know…"}
+          {paymentNoticeStatus === "sent" &&
+            "Thanks — we've emailed you and flagged your order for confirmation. We'll be in touch on WhatsApp shortly."}
+          {paymentNoticeStatus === "error" &&
+            "That didn't go through — please also message us directly below so nothing gets missed."}
         </p>
 
         <Button
           href={paymentSentUrl}
           target="_blank"
           rel="noopener noreferrer"
-          variant="primary"
-          className="mt-6 w-full"
+          variant="secondary"
+          className="mt-3 w-full"
         >
-          I&apos;ve sent the transfer — notify us on WhatsApp
+          Also send payment screenshot on WhatsApp
         </Button>
         <p className="font-utility text-xs text-olive-mute mt-3">
-          Attach your payment screenshot in WhatsApp ({WHATSAPP_DISPLAY_NUMBER}) so we can
-          confirm and get your order moving.
+          Attaching a screenshot to WhatsApp ({WHATSAPP_DISPLAY_NUMBER}) is the fastest way to
+          get your order confirmed.
         </p>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handlePlaceOrder} className="px-6 py-12 sm:px-10 md:px-16 grid md:grid-cols-2 gap-12">
+    <form onSubmit={handleConfirmOrder} className="px-6 py-12 sm:px-10 md:px-16 grid md:grid-cols-2 gap-12">
       <div className="flex flex-col gap-8">
         <div>
           <h1 className="font-display text-2xl">Checkout</h1>
@@ -163,30 +203,33 @@ export default function CheckoutFlow() {
         </div>
 
         <div>
-          <p className="font-utility text-xs text-chili">Delivery — Lagos only for now</p>
+          <label htmlFor="checkout-location" className="font-utility text-xs text-chili">
+            Delivery — Lagos only for now
+          </label>
           <p className="font-body text-sm text-olive-mute mt-1">
-            Select your area to see the estimated delivery fee.
+            Type your area and we&apos;ll work out the delivery fee.
           </p>
-          <div className="grid grid-cols-2 gap-2 mt-4">
-            {DELIVERY_ZONES.map((z) => (
-              <button
-                key={z.id}
-                type="button"
-                onClick={() => setZoneId(z.id)}
-                aria-pressed={zoneId === z.id}
-                className={`border px-4 py-3 text-left transition-colors duration-200 ease-brand ${
-                  zoneId === z.id
-                    ? "border-chili bg-chili/10"
-                    : "border-olive-mute hover:border-olive"
-                }`}
-              >
-                <p className="font-body text-sm">{z.name}</p>
-                <p className="font-utility text-xs text-olive-mute mt-1">
-                  {formatNaira(z.fee)} · {z.eta}
-                </p>
-              </button>
-            ))}
-          </div>
+          <input
+            id="checkout-location"
+            type="text"
+            placeholder="e.g. Yaba, Lekki, Ikeja…"
+            required
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            onBlur={() => setLocationTouched(true)}
+            className={`${INPUT_CLASSES} mt-3`}
+          />
+          {zone ? (
+            <p className="font-utility text-xs text-olive mt-2">
+              Delivering to {zone.name} · {formatNaira(zone.fee)} · {zone.eta}
+            </p>
+          ) : null}
+          {locationUnavailable ? (
+            <p className="font-body text-sm text-chili mt-2">
+              We don&apos;t currently deliver outside Lagos — sorry! Not sure your area is
+              covered? Message us on WhatsApp ({WHATSAPP_DISPLAY_NUMBER}) and we&apos;ll check.
+            </p>
+          ) : null}
         </div>
 
         <div className="border-t border-olive-mute pt-4 flex flex-col gap-2 font-utility text-sm">
@@ -196,7 +239,7 @@ export default function CheckoutFlow() {
           </div>
           <div className="flex justify-between">
             <span>Delivery</span>
-            <span>{zone ? formatNaira(zone.fee) : "Select an area"}</span>
+            <span>{zone ? formatNaira(zone.fee) : "Enter your area"}</span>
           </div>
           <div className="flex justify-between font-display text-lg mt-2">
             <span>Total</span>
@@ -247,7 +290,7 @@ export default function CheckoutFlow() {
         </div>
 
         <Button type="submit" variant="primary" className="w-full mt-2" disabled={!zone}>
-          Place order
+          Confirm order
         </Button>
         <Link href="/shop" className="font-utility text-xs text-olive-mute hover:text-chili">
           Continue shopping

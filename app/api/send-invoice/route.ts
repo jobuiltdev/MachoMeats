@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { formatNaira } from "@/lib/products";
 import { BUSINESS_BANK_DETAILS, WHATSAPP_DISPLAY_NUMBER } from "@/lib/checkout";
-
-type InvoiceLine = { name: string; quantity: number; price: number };
+import { buildOrderItemRowsHtml, getEmailFromAddress, type EmailOrderLine } from "@/lib/email";
 
 type InvoiceRequestBody = {
   orderRef: string;
@@ -11,18 +10,13 @@ type InvoiceRequestBody = {
   customerEmail: string;
   deliveryZoneName: string;
   deliveryFee: number;
-  lines: InvoiceLine[];
+  lines: EmailOrderLine[];
   subtotal: number;
   total: number;
 };
 
 function buildInvoiceHtml(order: InvoiceRequestBody): string {
-  const rows = order.lines
-    .map(
-      (line) =>
-        `<tr><td style="padding:8px 0;">${line.name} x${line.quantity}</td><td style="padding:8px 0;text-align:right;">${formatNaira(line.price * line.quantity)}</td></tr>`
-    )
-    .join("");
+  const rows = buildOrderItemRowsHtml(order.lines);
 
   return `
     <div style="font-family:sans-serif;color:#2C2E1E;max-width:480px;margin:0 auto;">
@@ -61,7 +55,7 @@ export async function POST(request: Request) {
   const resend = new Resend(apiKey);
 
   const { error } = await resend.emails.send({
-    from: process.env.INVOICE_FROM_EMAIL ?? "Macho Meats <onboarding@resend.dev>",
+    from: getEmailFromAddress(),
     to: order.customerEmail,
     subject: `Your Macho Meats invoice — ${order.orderRef}`,
     html: buildInvoiceHtml(order),

@@ -3,6 +3,7 @@ import { formatNaira } from "@/lib/products";
 
 export const WHATSAPP_NUMBER = "2348162404866";
 export const WHATSAPP_DISPLAY_NUMBER = "08162404866";
+export const ADMIN_EMAIL = "machomeatss@gmail.com";
 
 export const BUSINESS_BANK_DETAILS = {
   accountName: "Macho Meats Enterprise",

@@ -38,3 +38,62 @@ export const DELIVERY_ZONES: DeliveryZone[] = [
 export function getDeliveryZoneById(id: string): DeliveryZone | undefined {
   return DELIVERY_ZONES.find((zone) => zone.id === id);
 }
+
+/**
+ * Common neighbourhood/landmark names mapped to the LGA that covers them, so
+ * customers can type where they actually live rather than hunt for the
+ * official LGA name. Best-effort — extend as mismatches turn up.
+ */
+const LOCATION_ALIASES: Record<string, string> = {
+  "ikosi ketu": "kosofe", ketu: "kosofe", ogudu: "kosofe", "mile 12": "kosofe",
+  somolu: "shomolu", bariga: "shomolu",
+  gra: "ikeja", "ikeja gra": "ikeja", opebi: "ikeja", allen: "ikeja", "allen avenue": "ikeja", omole: "ikeja", ogba: "ikeja",
+  yaba: "lagos-mainland", "ebute metta": "lagos-mainland", "ebute-metta": "lagos-mainland", iwaya: "lagos-mainland", costain: "lagos-mainland",
+  dopemu: "agege",
+  "idi oro": "mushin", "idi-oro": "mushin", idioro: "mushin",
+  oshodi: "oshodi-isolo", isolo: "oshodi-isolo",
+  egbeda: "alimosho", ikotun: "alimosho", idimu: "alimosho", ipaja: "alimosho", akowonjo: "alimosho", "abule egba": "alimosho", "iyana ipaja": "alimosho",
+  ojuelegba: "surulere", aguda: "surulere", masha: "surulere",
+  "isale eko": "lagos-island", marina: "lagos-island", cms: "lagos-island",
+  lekki: "eti-osa", "victoria island": "eti-osa", vi: "eti-osa", ikoyi: "eti-osa", ajah: "eti-osa", "eti osa": "eti-osa", chevron: "eti-osa", ilasan: "eti-osa", agungi: "eti-osa", osapa: "eti-osa",
+  ajegunle: "ajeromi-ifelodun", boundary: "ajeromi-ifelodun",
+  festac: "amuwo-odofin", "festac town": "amuwo-odofin", "satellite town": "amuwo-odofin", "mile 2": "amuwo-odofin",
+  okokomaiko: "ojo", alaba: "ojo", "trade fair": "ojo",
+  sangotedo: "ibeju-lekki", awoyaya: "ibeju-lekki", eleko: "ibeju-lekki", "ibeju lekki": "ibeju-lekki",
+};
+
+type Keyword = { phrase: string; zoneId: string };
+
+const KEYWORDS: Keyword[] = [
+  ...DELIVERY_ZONES.map((zone) => ({ phrase: zone.name.toLowerCase().split(" (")[0], zoneId: zone.id })),
+  ...Object.entries(LOCATION_ALIASES).map(([alias, zoneId]) => ({ phrase: alias, zoneId })),
+  // Longest phrase first, so a specific match ("ibeju-lekki") is tried before
+  // a shorter one that happens to be a substring of it ("lekki").
+].sort((a, b) => b.phrase.length - a.phrase.length);
+
+/**
+ * Matches free-text customer input to a Lagos delivery zone against the LGA
+ * names and the alias list. Checked in three passes, each stricter than the
+ * last would be permissive: exact match (so short abbreviations like "VI"
+ * work), then "the input contains a full keyword phrase" (safe against
+ * collisions like "lekki" inside "ibeju-lekki" because direction matters),
+ * then "a keyword starts with what's typed so far" for still-typing input.
+ * Returns null if nothing in Lagos matches.
+ */
+export function matchLocationToZone(input: string): DeliveryZone | null {
+  const normalized = input.trim().toLowerCase();
+  if (!normalized) return null;
+
+  const exact = KEYWORDS.find((k) => k.phrase === normalized);
+  if (exact) return getDeliveryZoneById(exact.zoneId) ?? null;
+
+  const contained = KEYWORDS.find((k) => normalized.includes(k.phrase));
+  if (contained) return getDeliveryZoneById(contained.zoneId) ?? null;
+
+  if (normalized.length >= 3) {
+    const prefixOf = KEYWORDS.find((k) => k.phrase.startsWith(normalized));
+    if (prefixOf) return getDeliveryZoneById(prefixOf.zoneId) ?? null;
+  }
+
+  return null;
+}
