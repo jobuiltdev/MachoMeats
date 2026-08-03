@@ -26,6 +26,7 @@ type CartContextValue = {
   addItem: (product: Product, quantity?: number) => void;
   removeItem: (slug: string) => void;
   setQuantity: (slug: string, quantity: number) => void;
+  clearCart: () => void;
   openCart: () => void;
   closeCart: () => void;
 };
@@ -98,6 +99,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const clearCart = useCallback(() => setLines([]), []);
+
   const openCart = useCallback(() => setIsOpen(true), []);
   const closeCart = useCallback(() => setIsOpen(false), []);
 
@@ -118,6 +121,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     addItem,
     removeItem,
     setQuantity,
+    clearCart,
     openCart,
     closeCart,
   };

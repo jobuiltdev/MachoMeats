@@ -3,7 +3,6 @@
 import { useEffect, useRef } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { formatNaira } from "@/lib/products";
-import { checkoutViaWhatsApp } from "@/lib/checkout";
 import Button from "@/components/Button";
 
 const FOCUSABLE_SELECTOR =
@@ -144,13 +143,12 @@ export default function CartDrawer() {
             <span>{formatNaira(subtotal)}</span>
           </div>
           <Button
-            type="button"
+            href="/checkout"
             variant="primary"
-            className="w-full"
-            disabled={lines.length === 0}
-            onClick={() => checkoutViaWhatsApp(lines, subtotal)}
+            className={`w-full ${lines.length === 0 ? "opacity-40 pointer-events-none" : ""}`}
+            onClick={closeCart}
           >
-            Complete order on WhatsApp
+            Checkout
           </Button>
         </div>
       </div>

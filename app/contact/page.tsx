@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import SectionHeading from "@/components/SectionHeading";
 import ContactForm from "@/components/ContactForm";
 import Button from "@/components/Button";
-import { WHATSAPP_NUMBER, WHATSAPP_DISPLAY_NUMBER } from "@/lib/checkout";
+import TornDivider from "@/components/TornDivider";
+import { WHATSAPP_NUMBER, WHATSAPP_DISPLAY_NUMBER, buildBulkOrderWhatsAppUrl } from "@/lib/checkout";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -20,7 +21,7 @@ export default function ContactPage() {
         />
       </div>
 
-      <div className="grid md:grid-cols-2 gap-12 px-6 pb-20 sm:px-10 md:px-16">
+      <div className="relative grid md:grid-cols-2 gap-12 px-6 pb-20 sm:px-10 md:px-16">
         <div className="flex flex-col gap-8">
           <Button href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer" variant="primary" className="w-fit">
             Message us on WhatsApp
@@ -49,20 +50,31 @@ export default function ContactPage() {
               @machomeatss
             </a>
           </div>
-
-          <div className="border-t border-olive-mute/40 pt-6">
-            <p className="font-utility text-xs text-chili">Bulk & corporate orders</p>
-            <p className="font-body text-base text-olive mt-2 max-w-sm">
-              Parties, corporate gifting, resale — message us with the quantity and
-              date you need and we&apos;ll sort out pricing.
-            </p>
-          </div>
         </div>
 
         <div>
           <ContactForm />
         </div>
+
+        <TornDivider fillClassName="fill-olive-deep" />
       </div>
+
+      <section className="on-dark bg-olive-deep px-6 py-16 sm:px-10 md:px-16">
+        <div className="flex flex-col items-start gap-6 max-w-xl">
+          <SectionHeading
+            eyebrow="Bulk & corporate orders"
+            title="Ordering for a party, office or resale?"
+            description="Parties, corporate gifting, resale — message us with the quantity and date you need and we'll sort out pricing."
+            tone="dark"
+          />
+          <p className="font-utility text-xs text-kraft/70">
+            Minimum bulk order: 1kg of kilishi or shredded meat.
+          </p>
+          <Button href={buildBulkOrderWhatsAppUrl()} target="_blank" rel="noopener noreferrer" variant="primary">
+            Talk to us about bulk orders
+          </Button>
+        </div>
+      </section>
     </main>
   );
 }

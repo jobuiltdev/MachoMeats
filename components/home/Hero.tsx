@@ -17,9 +17,9 @@ export default function Hero() {
 
       <div className="relative z-10 flex h-full flex-col items-start justify-end px-6 pb-20 sm:px-10 sm:pb-24 md:px-16">
         <h1 className="font-display text-4xl text-paper leading-[0.9] animate-fade-rise">
-          No Meat
+          Sharing Love
           <br />
-          No Life
+          Through Meat
         </h1>
         <div
           className="mt-8 animate-fade-rise [animation-delay:250ms]"

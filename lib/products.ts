@@ -54,7 +54,7 @@ export const products: Product[] = [
     slug: "shredded",
     name: "Shredded Beef — Dambu Nama",
     shortName: "Shredded Beef",
-    navLabel: "Shredded Beef Meat Collection",
+    navLabel: "Shredded Meat Collection",
     href: "/shredded",
     collection: "shredded",
     price: 1800,

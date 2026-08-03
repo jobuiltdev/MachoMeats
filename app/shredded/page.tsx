@@ -10,7 +10,7 @@ const collectionProducts = getProductsByCollection("shredded");
 const heroProduct = collectionProducts[0];
 
 export const metadata: Metadata = {
-  title: "Shredded Beef Meat Collection",
+  title: "Shredded Meat Collection",
   description: heroProduct.tagline,
 };
 
@@ -34,7 +34,7 @@ export default function ShreddedCollectionPage() {
         />
         <div className="absolute inset-0 bg-olive-deep/30" />
         <div className="relative z-10 flex h-full flex-col items-start justify-end px-6 pb-16 sm:px-10 md:px-16">
-          <p className="font-utility text-xs text-gold">Shredded Beef Meat Collection</p>
+          <p className="font-utility text-xs text-gold">Shredded Meat Collection</p>
           <h1 className="font-display text-3xl text-paper mt-2">Dambu Nama</h1>
         </div>
         <TornDivider fillClassName="fill-paper" />
