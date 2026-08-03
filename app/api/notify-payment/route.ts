@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { formatNaira } from "@/lib/products";
-import { ADMIN_EMAIL, BUSINESS_BANK_DETAILS, WHATSAPP_DISPLAY_NUMBER } from "@/lib/checkout";
+import { ADMIN_EMAILS, BUSINESS_BANK_DETAILS, WHATSAPP_DISPLAY_NUMBER } from "@/lib/checkout";
 import { buildOrderItemRowsHtml, getEmailFromAddress, type EmailOrderLine } from "@/lib/email";
 
 type NotifyPaymentRequestBody = {
@@ -70,7 +70,7 @@ export async function POST(request: Request) {
     }),
     resend.emails.send({
       from,
-      to: ADMIN_EMAIL,
+      to: ADMIN_EMAILS,
       subject: `Payment claimed — Order ${order.orderRef} — ${formatNaira(order.total)}`,
       html: buildAdminHtml(order),
     }),
