@@ -11,7 +11,7 @@ const STEPS = [
   {
     title: "Sun-dry",
     copy: "Laid out on open racks until the water is gone and the flavour concentrates.",
-    image: "/images/pouches-lineup.jpg",
+    image: "/images/pouch-kilishi-3.jpg",
   },
   {
     title: "Spice",
