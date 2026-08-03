@@ -6,12 +6,12 @@ export default function Hero() {
   return (
     <section className="on-dark relative h-[100svh] min-h-[560px] w-full overflow-hidden">
       <Image
-        src="/images/kilishi-slab-hero.jpg"
+        src="/images/kilishi-slab-hero-2.jpg"
         alt="A gloved hand holding a torn, chili-flecked slab of kilishi"
         fill
         priority
         sizes="100vw"
-        className="object-cover"
+        className="object-cover object-[65%_25%] sm:object-[60%_35%]"
       />
       <div className="absolute inset-0 bg-olive-deep/45" />
 

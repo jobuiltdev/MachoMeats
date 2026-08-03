@@ -6,7 +6,7 @@ const STEPS = [
   {
     title: "Slice",
     copy: "Fresh beef, cut paper-thin by hand. Thickness is the whole game; too thick and it never dries properly.",
-    image: "/images/kilishi-slab-hero.jpg",
+    image: "/images/kilishi-slab-hero-2.jpg",
   },
   {
     title: "Sun-dry",

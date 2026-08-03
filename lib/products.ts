@@ -45,8 +45,8 @@ export const products: Product[] = [
     ],
     ingredients: ["beef", "salt", "ginger", "garlic", "yaji (suya spice)", "onion", "vegetable oil"],
     image: {
-      card: "/images/pouch-kilishi.jpg",
-      hero: "/images/kilishi-slab-hero.jpg",
+      card: "/images/pouch-kilishi-2.jpg",
+      hero: "/images/kilishi-slab-hero-2.jpg",
       alt: "A gloved hand holding a torn, chili-flecked slab of kilishi",
     },
   },

@@ -1,9 +1,9 @@
 import Image from "next/image";
 
 const STRIP_IMAGES = [
-  { src: "/images/kilishi-slab-hero.jpg", alt: "Kilishi slab, chili-flecked" },
+  { src: "/images/kilishi-slab-hero-2.jpg", alt: "Kilishi slab, chili-flecked" },
   { src: "/images/dambu-bowl.jpg", alt: "Shredded beef dambu nama in a bowl" },
-  { src: "/images/pouch-kilishi.jpg", alt: "Kilishi pouch styled on kraft" },
+  { src: "/images/pouch-kilishi-2.jpg", alt: "Kilishi pouch styled on kraft" },
   { src: "/images/kilishi-plated.jpg", alt: "Torn kilishi pieces on a plate" },
   { src: "/images/pouch-shredded-beef.jpg", alt: "Shredded beef pouch styled on kraft" },
   { src: "/images/pouches-lineup.jpg", alt: "Row of Macho Meats pouches on dark wood" },
