@@ -4,7 +4,7 @@ export type Product = {
   name: string;
   /** Short name for cart line items and nav */
   shortName: string;
-  /** Label as it appears in the primary nav — may name a collection, not just this SKU */
+  /** Label as it appears in the primary nav, may name a collection, not just this SKU */
   navLabel: string;
   /** Route for the product/collection landing page */
   href: string;
@@ -13,19 +13,19 @@ export type Product = {
   price: number;
   currency: "NGN";
   weightGrams: number;
-  /** One line, used on cards and the shop grid — never paired with weight */
+  /** One line, used on cards and the shop grid, never paired with weight */
   tagline: string;
   /** Poetic body copy paragraphs for the product/landing page */
   description: string[];
   ingredients: string[];
   image: {
-    /** Styled pouch shot — used on ProductCard and the shop grid */
+    /** Styled pouch shot, used on ProductCard and the shop grid */
     card: string;
-    /** Full-bleed lifestyle shot — used on the homepage band and landing page hero */
+    /** Full-bleed lifestyle shot, used on the homepage band and landing page hero */
     hero: string;
     alt: string;
   };
-  /** Flip to true/false to open or close ordering — see the comment on shredded-chicken below. */
+  /** Flip to true/false to open or close ordering. */
   inStock: boolean;
 };
 
@@ -47,7 +47,7 @@ export const products: Product[] = [
     ],
     ingredients: ["beef", "salt", "ginger", "garlic", "yaji (suya spice)", "onion", "vegetable oil"],
     image: {
-      card: "/images/pouch-kilishi-2.jpg",
+      card: "/images/pouch-kilishi-3.jpg",
       hero: "/images/kilishi-slab-hero-2.jpg",
       alt: "A gloved hand holding a torn, chili-flecked slab of kilishi",
     },
@@ -97,9 +97,6 @@ export const products: Product[] = [
       hero: "/images/pouch-shredded-chicken.jpg",
       alt: "Shredded chicken dambu kaza pouch, styled on kraft",
     },
-    // Restocking? Flip this to true, commit, and push — Vercel redeploys
-    // automatically. Easiest done straight from github.com: open this file,
-    // click the pencil (edit) icon, change false to true, and commit to main.
     inStock: false,
   },
 ];
