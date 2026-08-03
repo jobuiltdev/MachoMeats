@@ -11,6 +11,10 @@ const BAND_IMAGE_OVERRIDE: Record<string, string> = {
 };
 
 export default function ProductBands() {
+  // Only in-stock SKUs get the full-height homepage treatment — out-of-stock
+  // items still list on /shop and their collection page.
+  const featuredProducts = products.filter((product) => product.inStock);
+
   return (
     <section className="bg-paper">
       <SectionHeading
@@ -19,7 +23,7 @@ export default function ProductBands() {
         className="px-6 pt-16 pb-8 sm:px-10 md:px-16"
       />
 
-      {products.map((product, index) => {
+      {featuredProducts.map((product, index) => {
         const imageFirst = index % 2 === 0;
         return (
           <div

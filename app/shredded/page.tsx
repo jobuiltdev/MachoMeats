@@ -80,7 +80,9 @@ export default function ShreddedCollectionPage() {
                 "@type": "Offer",
                 priceCurrency: product.currency,
                 price: product.price,
-                availability: "https://schema.org/InStock",
+                availability: product.inStock
+                  ? "https://schema.org/InStock"
+                  : "https://schema.org/OutOfStock",
                 url: `https://machomeats.com${product.href}`,
               },
             })),

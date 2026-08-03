@@ -25,6 +25,8 @@ export type Product = {
     hero: string;
     alt: string;
   };
+  /** Flip to true/false to open or close ordering — see the comment on shredded-chicken below. */
+  inStock: boolean;
 };
 
 export const products: Product[] = [
@@ -49,6 +51,7 @@ export const products: Product[] = [
       hero: "/images/kilishi-slab-hero-2.jpg",
       alt: "A gloved hand holding a torn, chili-flecked slab of kilishi",
     },
+    inStock: true,
   },
   {
     slug: "shredded",
@@ -67,10 +70,37 @@ export const products: Product[] = [
     ],
     ingredients: ["shredded beef", "ginger", "garlic", "yaji (suya spice)", "onion", "vegetable oil"],
     image: {
-      card: "/images/pouch-shredded-beef.jpg",
+      card: "/images/pouch-shredded-beef-2.jpg",
       hero: "/images/dambu-bowl.jpg",
       alt: "Shredded beef dambu nama piled in a white bowl",
     },
+    inStock: true,
+  },
+  {
+    slug: "shredded-chicken",
+    name: "Shredded Chicken — Dambu Kaza",
+    shortName: "Shredded Chicken",
+    navLabel: "Shredded Meat Collection",
+    href: "/shredded",
+    collection: "shredded",
+    price: 2200,
+    currency: "NGN",
+    weightGrams: 25,
+    tagline: "Chicken cooked down and pulled into golden floss, loaded with yaji.",
+    description: [
+      "Chicken cooked until it gives up, then pulled into strands fine enough to catch the light. Fried down in its own spice until every thread is dry, golden and loaded.",
+      "Over white rice. Folded into agege bread. Straight from the pouch with a spoon, standing at your kitchen counter, which is how most of it actually gets eaten.",
+    ],
+    ingredients: ["shredded chicken", "ginger", "garlic", "yaji (suya spice)", "onion", "vegetable oil"],
+    image: {
+      card: "/images/pouch-shredded-chicken.jpg",
+      hero: "/images/pouch-shredded-chicken.jpg",
+      alt: "Shredded chicken dambu kaza pouch, styled on kraft",
+    },
+    // Restocking? Flip this to true, commit, and push — Vercel redeploys
+    // automatically. Easiest done straight from github.com: open this file,
+    // click the pencil (edit) icon, change false to true, and commit to main.
+    inStock: false,
   },
 ];
 
@@ -80,6 +110,15 @@ export function getProductBySlug(slug: string): Product | undefined {
 
 export function getProductsByCollection(collection: string): Product[] {
   return products.filter((p) => p.collection === collection);
+}
+
+/** Nav links, one per unique destination — several SKUs can share a collection page (e.g. /shredded). */
+export function getCollectionNavLinks(): { label: string; href: string }[] {
+  const seen = new Map<string, string>();
+  for (const product of products) {
+    if (!seen.has(product.href)) seen.set(product.href, product.navLabel);
+  }
+  return Array.from(seen, ([href, label]) => ({ href, label }));
 }
 
 export function formatNaira(amount: number): string {

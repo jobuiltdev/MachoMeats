@@ -13,6 +13,14 @@ export default function AddToBagButton({
 }) {
   const { addItem } = useCart();
 
+  if (!product.inStock) {
+    return (
+      <Button type="button" variant="secondary" className={className} disabled>
+        Out of stock
+      </Button>
+    );
+  }
+
   return (
     <Button
       type="button"

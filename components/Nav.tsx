@@ -5,11 +5,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useCart } from "@/contexts/CartContext";
-import { products } from "@/lib/products";
+import { getCollectionNavLinks } from "@/lib/products";
 
 const NAV_LINKS = [
   { label: "Shop All", href: "/shop" },
-  ...products.map((p) => ({ label: p.navLabel, href: p.href })),
+  ...getCollectionNavLinks(),
   { label: "FAQ", href: "/faq" },
   { label: "Contact Us", href: "/contact" },
 ];

@@ -64,6 +64,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [lines, hydrated]);
 
   const addItem = useCallback((product: Product, quantity = 1) => {
+    if (!product.inStock) return;
     setLines((prev) => {
       const existing = prev.find((line) => line.slug === product.slug);
       if (existing) {

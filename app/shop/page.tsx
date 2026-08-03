@@ -16,7 +16,7 @@ export default function ShopPage() {
         <SectionHeading
           eyebrow="Shop all"
           title="The full lineup"
-          description="Handmade, no preservatives, no colouring, no additives. Two products right now, more on the way."
+          description="Handmade, no preservatives, no colouring, no additives. Shredded chicken is back in stock soon."
         />
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 px-6 pb-20 sm:px-10 md:px-16">

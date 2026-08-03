@@ -15,8 +15,15 @@ export default function ProductCard({ product }: { product: Product }) {
             alt={product.image.alt}
             fill
             sizes="(min-width: 768px) 50vw, 100vw"
-            className="object-cover transition-transform duration-500 ease-brand group-hover:scale-[1.03]"
+            className={`object-cover transition-transform duration-500 ease-brand group-hover:scale-[1.03] ${
+              product.inStock ? "" : "opacity-60 grayscale-[40%]"
+            }`}
           />
+          {!product.inStock && (
+            <span className="absolute top-3 left-3 bg-olive-deep text-paper font-utility text-xs px-3 py-1.5">
+              Out of stock
+            </span>
+          )}
           <TornDivider
             fillClassName="fill-chili"
             flip
