@@ -99,6 +99,28 @@
     animation: fade-rise 0.8s var(--ease-brand) both;
   }
 
+  /* Faint aged-paper grain — a quiet texture pass for the antique/craft feel,
+     layered on top of flat surfaces without competing with photography. */
+  .grain {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .grain::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.05;
+    mix-blend-mode: multiply;
+  }
+
+  .on-dark .grain::before {
+    opacity: 0.08;
+    mix-blend-mode: overlay;
+  }
+
   /* Archivo Expanded 800 — headline voice, "butcher signage" */
   .font-display {
     font-family: var(--font-display);

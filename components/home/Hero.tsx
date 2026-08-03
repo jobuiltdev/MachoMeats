@@ -14,10 +14,11 @@ export default function Hero() {
         className="object-cover object-[65%_25%] sm:object-[60%_35%]"
       />
       <div className="absolute inset-0 bg-olive-deep/45" />
+      <div className="absolute inset-0 bg-radial from-transparent to-olive-deep/50" />
 
       <div className="relative z-10 flex h-full flex-col items-start justify-end px-6 pb-20 sm:px-10 sm:pb-24 md:px-16">
-        <h1 className="font-display text-4xl text-paper leading-[0.9] animate-fade-rise">
-          Sharing Love
+        <h1 className="font-display text-3xl sm:text-4xl text-paper leading-[0.9] animate-fade-rise">
+          Sharing <span className="text-chili">Love</span>
           <br />
           Through Meat
         </h1>

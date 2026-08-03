@@ -6,7 +6,7 @@ const STEPS = [
   {
     title: "Slice",
     copy: "Fresh beef, cut paper-thin by hand. Thickness is the whole game; too thick and it never dries properly.",
-    image: "/images/kilishi-slab-hero-2.jpg",
+    image: "/images/kilishi-macro.jpg",
   },
   {
     title: "Sun-dry",
@@ -27,7 +27,7 @@ const STEPS = [
 
 export default function HowItsMade() {
   return (
-    <section className="on-dark bg-olive-deep text-paper">
+    <section className="grain on-dark bg-olive-deep text-paper">
       <SectionHeading
         eyebrow="Trust the process"
         title="How kilishi is made"

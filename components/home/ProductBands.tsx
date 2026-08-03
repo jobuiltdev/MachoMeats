@@ -5,6 +5,11 @@ import AddToBagButton from "@/components/AddToBagButton";
 import Reveal from "@/components/Reveal";
 import SectionHeading from "@/components/SectionHeading";
 
+/** Overrides the product's default hero shot for this band, where a distinct photo reads better than reusing the homepage hero image. */
+const BAND_IMAGE_OVERRIDE: Record<string, string> = {
+  kilishi: "/images/kilishi-macro.jpg",
+};
+
 export default function ProductBands() {
   return (
     <section className="bg-paper">
@@ -27,7 +32,7 @@ export default function ProductBands() {
               }`}
             >
               <Image
-                src={product.image.hero}
+                src={BAND_IMAGE_OVERRIDE[product.slug] ?? product.image.hero}
                 alt={product.image.alt}
                 fill
                 sizes="(min-width: 768px) 50vw, 100vw"

@@ -11,7 +11,7 @@ const NAV_LINKS = [
 
 export default function Footer() {
   return (
-    <footer className="on-dark bg-olive-deep text-paper px-6 py-12 sm:px-10 md:px-16">
+    <footer className="grain on-dark bg-olive-deep text-paper px-6 py-12 sm:px-10 md:px-16">
       <div className="flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
         <div className="flex items-center gap-3">
           <Image
