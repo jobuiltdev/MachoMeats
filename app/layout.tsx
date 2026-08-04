@@ -6,6 +6,7 @@ import { CartProvider } from "@/contexts/CartContext";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
+import PageviewTracker from "@/components/analytics/PageviewTracker";
 
 const archivo = Archivo({
   variable: "--font-archivo",
@@ -51,6 +52,7 @@ export default function RootLayout({
           <Footer />
           <CartDrawer />
         </CartProvider>
+        <PageviewTracker />
         <Analytics />
       </body>
     </html>

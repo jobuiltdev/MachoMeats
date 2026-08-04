@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
-import { kv } from "@vercel/kv";
+import { getRedis } from "@/lib/redis";
 import { ADMIN_COOKIE_NAME, getAdminSessionToken } from "@/lib/admin-auth";
 import { loginAdmin, logoutAdmin } from "./actions";
 
@@ -18,27 +18,35 @@ function dateKey(daysAgo: number): string {
 async function getPageviewStats(): Promise<{
   total: number;
   days: { date: string; count: number }[];
-  kvConfigured: boolean;
+  redisConfigured: boolean;
 }> {
   const dayKeys = Array.from({ length: 7 }, (_, i) => dateKey(i));
+  const redis = getRedis();
 
-  try {
-    const [total, ...dayCounts] = await Promise.all([
-      kv.get<number>("pageviews:total"),
-      ...dayKeys.map((key) => kv.get<number>(`pageviews:${key}`)),
-    ]);
-
-    return {
-      total: total ?? 0,
-      days: dayKeys.map((date, i) => ({ date, count: dayCounts[i] ?? 0 })),
-      kvConfigured: true,
-    };
-  } catch {
-    // KV hasn't been provisioned/connected yet — show zeros instead of crashing.
+  if (!redis) {
     return {
       total: 0,
       days: dayKeys.map((date) => ({ date, count: 0 })),
-      kvConfigured: false,
+      redisConfigured: false,
+    };
+  }
+
+  try {
+    const keys = ["pageviews:total", ...dayKeys.map((key) => `pageviews:${key}`)];
+    const values = await redis.mget(...keys);
+    const [total, ...dayCounts] = values.map((value) => (value ? parseInt(value, 10) : 0));
+
+    return {
+      total,
+      days: dayKeys.map((date, i) => ({ date, count: dayCounts[i] ?? 0 })),
+      redisConfigured: true,
+    };
+  } catch {
+    // Redis is unreachable (bad URL, network blip) — show zeros instead of crashing.
+    return {
+      total: 0,
+      days: dayKeys.map((date) => ({ date, count: 0 })),
+      redisConfigured: false,
     };
   }
 }
@@ -101,7 +109,7 @@ export default async function AdminPage({
         </form>
       </div>
 
-      {!stats.kvConfigured && (
+      {!stats.redisConfigured && (
         <p className="font-body text-sm text-chili mt-6 max-w-2xl">
           Analytics storage isn&apos;t connected yet, so these are all zero. See the setup
           note below.
@@ -139,11 +147,11 @@ export default async function AdminPage({
         devices — check the Vercel Analytics dashboard for this project.
       </p>
 
-      {!stats.kvConfigured && (
+      {!stats.redisConfigured && (
         <p className="font-body text-sm text-olive-mute mt-4 max-w-2xl">
-          Setup: in Vercel → Storage, create a KV database and connect it to this project
-          — the env vars wire up automatically. Redeploy afterward and counts will start
-          showing up here.
+          Setup: in Vercel → Storage, create a Redis database and connect it to this
+          project — the REDIS_URL env var wires up automatically. Redeploy afterward and
+          counts will start showing up here.
         </p>
       )}
     </main>
