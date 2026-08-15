@@ -2,7 +2,12 @@ import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { formatNaira } from "@/lib/products";
 import { BUSINESS_BANK_DETAILS, WHATSAPP_DISPLAY_NUMBER } from "@/lib/checkout";
-import { buildOrderItemRowsHtml, getEmailFromAddress, type EmailOrderLine } from "@/lib/email";
+import {
+  buildOrderItemRowsHtml,
+  getEmailFromAddress,
+  getEmailReplyToAddress,
+  type EmailOrderLine,
+} from "@/lib/email";
 
 type InvoiceRequestBody = {
   orderRef: string;
@@ -56,6 +61,7 @@ export async function POST(request: Request) {
 
   const { error } = await resend.emails.send({
     from: getEmailFromAddress(),
+    replyTo: getEmailReplyToAddress(),
     to: order.customerEmail,
     subject: `Your Macho Meats invoice — ${order.orderRef}`,
     html: buildInvoiceHtml(order),

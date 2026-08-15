@@ -6,6 +6,11 @@ export function getEmailFromAddress(): string {
   return process.env.INVOICE_FROM_EMAIL ?? "Macho Meats <onboarding@resend.dev>";
 }
 
+/** machomeats.org has no MX record, so replies to the from address would bounce. */
+export function getEmailReplyToAddress(): string {
+  return process.env.INVOICE_REPLY_TO_EMAIL ?? "machomeatss@gmail.com";
+}
+
 export function buildOrderItemRowsHtml(lines: EmailOrderLine[]): string {
   return lines
     .map(

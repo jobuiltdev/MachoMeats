@@ -2,7 +2,12 @@ import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { formatNaira } from "@/lib/products";
 import { ADMIN_EMAILS, BUSINESS_BANK_DETAILS, WHATSAPP_DISPLAY_NUMBER } from "@/lib/checkout";
-import { buildOrderItemRowsHtml, getEmailFromAddress, type EmailOrderLine } from "@/lib/email";
+import {
+  buildOrderItemRowsHtml,
+  getEmailFromAddress,
+  getEmailReplyToAddress,
+  type EmailOrderLine,
+} from "@/lib/email";
 
 type NotifyPaymentRequestBody = {
   orderRef: string;
@@ -60,16 +65,19 @@ export async function POST(request: Request) {
 
   const resend = new Resend(apiKey);
   const from = getEmailFromAddress();
+  const replyTo = getEmailReplyToAddress();
 
   const [customerResult, adminResult] = await Promise.all([
     resend.emails.send({
       from,
+      replyTo,
       to: order.customerEmail,
       subject: `Payment received — Order ${order.orderRef}`,
       html: buildCustomerHtml(order),
     }),
     resend.emails.send({
       from,
+      replyTo,
       to: ADMIN_EMAILS,
       subject: `Payment claimed — Order ${order.orderRef} — ${formatNaira(order.total)}`,
       html: buildAdminHtml(order),
